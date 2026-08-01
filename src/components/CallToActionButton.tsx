@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router";
 
 const item: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -22,6 +23,8 @@ const arrowHover: Variants = {
 };
 
 export default function CallToActionButton() {
+  const navigate = useNavigate();
+
   return (
     <motion.div variants={item}>
       <motion.button
@@ -31,6 +34,9 @@ export default function CallToActionButton() {
         initial="rest"
         whileHover="hover"
         whileTap={{ scale: 0.97 }}
+        onClick={() => {
+          navigate("/questionnaire");
+        }}
       >
         {/* Shine sweep on hover */}
         <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />

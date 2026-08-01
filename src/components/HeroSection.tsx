@@ -1,16 +1,8 @@
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
-import {
-  Sparkles,
-  Smile,
-  Zap,
-  Sparkle,
-  Leaf,
-  Heart,
-  Search,
-  ChevronDown,
-} from "lucide-react";
+import { Sparkles, ChevronDown } from "lucide-react";
 import CallToActionButton from "./CallToActionButton";
+import Emoji from "./Emoji";
 
 const gridVariants: Variants = {
   hidden: {},
@@ -25,23 +17,54 @@ const cardVariants: Variants = {
 };
 
 const MOODS = [
-  { label: "Happy", description: "Feel-good picks", icon: Smile },
-  { label: "Excited", description: "High energy movies", icon: Zap },
-  { label: "Mind-Blown", description: "Epic & thrilling", icon: Sparkle },
-  { label: "Relaxed", description: "Chill & comforting", icon: Leaf },
-  { label: "Emotional", description: "Touching stories", icon: Heart },
-  { label: "Curious", description: "Thought-provoking", icon: Search },
+  { id: "happy", label: "Happy", emoji: "😀" },
+  { id: "excited", label: "Excited", emoji: "🔥" },
+  { id: "relaxed", label: "Relaxed", emoji: "😌" },
+  { id: "mind-blown", label: "Mind-Blown", emoji: "🤯" },
+  { id: "sad", label: "Sad", emoji: "😭" },
+  { id: "curious", label: "Curious", emoji: "🤔" },
+  { id: "angry", label: "Angry", emoji: "😠" },
+  { id: "lonely", label: "Lonely", emoji: "😔" },
+  { id: "romantic", label: "Romantic", emoji: "💝" },
+  { id: "motivated", label: "Motivated", emoji: "💪" },
+  { id: "adventurous", label: "Adventurous", emoji: "🌎" },
+  { id: "nostalgic", label: "Nostalgic", emoji: "🥹" },
 ];
+
+const easeInOutQuad = (t: number) =>
+  t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+function smoothScrollBy(distance: number, duration = 1000) {
+  const start = window.scrollY;
+  const startTime = performance.now();
+
+  function step(now: number) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    window.scrollTo(0, start + distance * easeInOutQuad(progress));
+    if (progress < 1) requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+}
 
 export default function HeroSection() {
   return (
     <section className="relative w-full overflow-hidden bg-[#0a0e1a] px-6 pb-16 pt-20 md:px-12">
-      {/* Background image */}
+      {/* Mobile Background image */}
+      <img
+        src="/hero-background(mobile).png"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover block md:hidden"
+      />
+
+      {/* Desktop Background image */}
       <img
         src="/hero-background.png"
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover hidden md:block"
       />
 
       {/* Dark overlay for readability */}
@@ -79,15 +102,15 @@ export default function HeroSection() {
           </p>
 
           <motion.div
-            className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6"
+            className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 md:grid-cols-6"
             variants={gridVariants}
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, amount: 0.3 }}
           >
-            {MOODS.map(({ label, description, icon: Icon }, index) => (
+            {MOODS.map(({ id, label, emoji }, index) => (
               <motion.button
-                key={label}
+                key={id}
                 type="button"
                 variants={cardVariants}
                 whileHover={{
@@ -96,7 +119,7 @@ export default function HeroSection() {
                   transition: { duration: 0.4 },
                 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-[#0a0e1a]/60 px-4 py-6 transition-colors hover:border-amber-500/60 hover:bg-[#0a0e1a]"
+                className="flex w-[104px] flex-shrink-0 flex-col items-center gap-3 rounded-xl border border-white/10 bg-[#0a0e1a]/60 px-4 py-5 transition-colors hover:border-amber-500/60 hover:bg-[#0a0e1a] sm:w-auto sm:flex-shrink sm:py-6"
               >
                 <motion.span
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-500/10 text-amber-500"
@@ -108,20 +131,24 @@ export default function HeroSection() {
                     delay: index * 0.15,
                   }}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Emoji emoji={emoji} label={label} size={32} />
                 </motion.span>
                 <span className="text-sm font-semibold text-white">
                   {label}
                 </span>
-                <span className="text-xs text-gray-400">{description}</span>
               </motion.button>
             ))}
           </motion.div>
 
           {/* Scroll indicator */}
-          <div className="absolute -bottom-5 left-1/2 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full bg-[#0a0e1a] border border-white/10">
+          <button
+            type="button"
+            onClick={() => smoothScrollBy(window.innerHeight)}
+            aria-label="Scroll down"
+            className="absolute -bottom-5 left-1/2 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-white/10 bg-[#0a0e1a] transition-colors hover:border-amber-500/60"
+          >
             <ChevronDown className="h-4 w-4 text-gray-400" />
-          </div>
+          </button>
         </div>
       </div>
     </section>
