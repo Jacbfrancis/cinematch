@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ArrowLeft } from "lucide-react";
@@ -9,6 +7,7 @@ import GenreStep from "../components/GenreStep";
 import TimeStep from "../components/TimeStep";
 import ExperienceStep from "../components/ExperienceStep";
 import Emoji from "../components/Emoji";
+import { useNavigate } from "react-router";
 
 interface Answers {
   mood: string | null;
@@ -58,6 +57,8 @@ const STEP_META: Record<number, { title: React.ReactNode; subtitle: string }> =
   };
 
 export default function Questionnaire() {
+  const navigate = useNavigate();
+
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState<Answers>({
     mood: null,
@@ -112,6 +113,7 @@ export default function Questionnaire() {
         {step === 1 && (
           <div className="mb-6 flex justify-center">
             <button
+              onClick={() => navigate("/surprise-me")}
               type="button"
               className="group inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-[#0d1224]/80 px-4 py-2 text-sm font-medium text-amber-400 backdrop-blur-sm transition-colors hover:border-amber-500 hover:bg-amber-500/10"
             >

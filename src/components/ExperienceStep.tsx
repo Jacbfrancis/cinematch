@@ -21,7 +21,7 @@ export default function ExperienceStep({
         onChange={(e) => onChange(e.target.value.slice(0, MAX_LENGTH))}
         maxLength={MAX_LENGTH}
         rows={5}
-        placeholder="e.g. I want something mind-bending, a movie that will make me cry, or something similar to Inception..."
+        placeholder="e.g. Something that'll wreck me emotionally, a plot twist I won't see coming..."
         className="w-full resize-none rounded-xl border border-amber-500/40 bg-[#0f1424] px-4 py-4 pl-12 text-sm text-white placeholder:text-gray-500 focus:border-amber-500 focus:outline-none"
       />
       <span className="pointer-events-none absolute bottom-3 right-4 text-xs text-gray-500">

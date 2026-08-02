@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { Sparkles, ChevronDown } from "lucide-react";
-import CallToActionButton from "./CallToActionButton";
 import Emoji from "./Emoji";
+import { MOODS } from "../constants/moods";
+import CallToActionButton from "./CallToActionButton";
 
 const gridVariants: Variants = {
   hidden: {},
@@ -16,25 +17,10 @@ const cardVariants: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
-const MOODS = [
-  { id: "happy", label: "Happy", emoji: "😀" },
-  { id: "excited", label: "Excited", emoji: "🔥" },
-  { id: "relaxed", label: "Relaxed", emoji: "😌" },
-  { id: "mind-blown", label: "Mind-Blown", emoji: "🤯" },
-  { id: "sad", label: "Sad", emoji: "😭" },
-  { id: "curious", label: "Curious", emoji: "🤔" },
-  { id: "angry", label: "Angry", emoji: "😠" },
-  { id: "lonely", label: "Lonely", emoji: "😔" },
-  { id: "romantic", label: "Romantic", emoji: "💝" },
-  { id: "motivated", label: "Motivated", emoji: "💪" },
-  { id: "adventurous", label: "Adventurous", emoji: "🌎" },
-  { id: "nostalgic", label: "Nostalgic", emoji: "🥹" },
-];
-
 const easeInOutQuad = (t: number) =>
   t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
-function smoothScrollBy(distance: number, duration = 1000) {
+function smoothScrollBy(distance: number, duration = 700) {
   const start = window.scrollY;
   const startTime = performance.now();
 
@@ -119,7 +105,7 @@ export default function HeroSection() {
                   transition: { duration: 0.4 },
                 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex w-[104px] flex-shrink-0 flex-col items-center gap-3 rounded-xl border border-white/10 bg-[#0a0e1a]/60 px-4 py-5 transition-colors hover:border-amber-500/60 hover:bg-[#0a0e1a] sm:w-auto sm:flex-shrink sm:py-6"
+                className="flex w-26 shrink-0 flex-col items-center gap-3 rounded-xl border border-white/10 bg-[#0a0e1a]/60 px-4 py-5 transition-colors hover:border-amber-500/60 hover:bg-[#0a0e1a] sm:w-auto sm:flex-shrink sm:py-6"
               >
                 <motion.span
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-500/10 text-amber-500"
