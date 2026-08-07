@@ -1,7 +1,7 @@
 import { GENRES } from "../constants/genres";
 import Emoji from "./Emoji";
 
-const SKIP_ID = "skip";
+const SUPRISE_ME_ID = "suprise me";
 
 interface GenreStepProps {
   value: string | null;
@@ -36,23 +36,23 @@ export default function GenreStep({ value, onChange }: GenreStepProps) {
         );
       })}
 
-      {/* Skip — for when nothing fits, without leaving genre unanswered */}
+      {/* suprise me — for when nothing fits, without leaving genre unanswered */}
       <button
         type="button"
-        onClick={() => onChange(SKIP_ID)}
+        onClick={() => onChange(SUPRISE_ME_ID)}
         className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed px-2 py-3 text-center transition-colors sm:flex-row sm:justify-start sm:gap-2 sm:px-4 sm:py-4 sm:text-left ${
-          value === SKIP_ID
+          value === SUPRISE_ME_ID
             ? "border-amber-500 bg-amber-500/10"
             : "border-white/20 bg-transparent text-gray-500 hover:border-white/40 hover:text-gray-300"
         }`}
       >
-        <Emoji emoji="🤷" label="Skip" size={20} />
+        <Emoji emoji="🤷" label="suprise me" size={20} />
         <span
           className={`text-xs font-medium leading-tight sm:text-sm ${
-            value === SKIP_ID ? "text-white" : "text-gray-500"
+            value === SUPRISE_ME_ID ? "text-white" : "text-gray-500"
           }`}
         >
-          Skip
+          Suprise me
         </span>
       </button>
     </div>

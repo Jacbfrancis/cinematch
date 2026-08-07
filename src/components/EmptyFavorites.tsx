@@ -1,10 +1,6 @@
 import { HeartOff, Clapperboard } from "lucide-react";
 
-type EmptyFavoritesProps = {
-  onBrowse?: () => void;
-};
-
-export default function EmptyFavorites({ onBrowse }: EmptyFavoritesProps) {
+export default function EmptyFavorites() {
   return (
     <div className="flex w-full flex-col items-center justify-center px-6 py-20 text-center md:px-12 md:py-28">
       {/* Icon */}
@@ -29,7 +25,6 @@ export default function EmptyFavorites({ onBrowse }: EmptyFavoritesProps) {
       {/* CTA */}
       <button
         type="button"
-        onClick={onBrowse}
         className="mt-8 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-amber-400 to-amber-500 px-6 py-3 text-sm font-bold text-[#0a0e1a] shadow-lg shadow-amber-500/20 transition-transform hover:scale-[1.02] hover:shadow-amber-500/30 active:scale-[0.99]"
       >
         <Clapperboard className="h-4 w-4" />
