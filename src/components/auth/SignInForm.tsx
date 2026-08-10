@@ -1,26 +1,73 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { auth } from "../../firebase/firebase";
 
-interface SignInFormProps {
+type SignInFormProps = {
   onSwitchToSignUp: () => void;
-  onSubmit?: (data: { email: string; password: string }) => void;
-}
+};
 
-export default function SignInForm({
-  onSwitchToSignUp,
-  onSubmit,
-}: SignInFormProps) {
+export default function SignInForm({ onSwitchToSignUp }: SignInFormProps) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    onSubmit?.({ email, password });
-  };
+    setError("");
+
+    try {
+      setLoading(true);
+
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Redirect to home page on success
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+
+      // Map Firebase error codes to user-friendly messages
+      const errorCode = error instanceof FirebaseError ? error.code : "unknown";
+
+      switch (errorCode) {
+        case "auth/user-not-found":
+          setError("No account found with this email. Please sign up.");
+          break;
+        case "auth/wrong-password":
+          setError("Incorrect password. Please try again.");
+          break;
+        case "auth/invalid-credential":
+          setError("Invalid email or password. Please try again.");
+          break;
+        case "auth/invalid-email":
+          setError("Please enter a valid email address.");
+          break;
+        case "auth/user-disabled":
+          setError("This account has been disabled. Contact support.");
+          break;
+        case "auth/too-many-requests":
+          setError(
+            "Too many failed attempts. Please try again later or reset your password.",
+          );
+          break;
+        case "auth/network-request-failed":
+          setError(
+            "Network error. Please check your internet connection and try again.",
+          );
+          break;
+        default:
+          setError("Failed to sign in. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="w-full max-w-md">
@@ -45,6 +92,13 @@ export default function SignInForm({
         </h1>
         <p className="mt-2 text-sm text-gray-400">Sign in to continue.</p>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {error}
+        </div>
+      )}
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-2">
@@ -113,10 +167,11 @@ export default function SignInForm({
 
         <button
           type="submit"
-          className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-6 py-3.5 text-sm font-bold text-[#0a0e1a] transition-transform hover:scale-[1.01]"
+          disabled={loading}
+          className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-6 py-3.5 text-sm font-bold text-[#0a0e1a] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Sign In
-          <ArrowRight className="h-4 w-4" />
+          {loading ? "Signing in..." : "Sign In"}
+          {!loading && <ArrowRight className="h-4 w-4" />}
         </button>
       </form>
 

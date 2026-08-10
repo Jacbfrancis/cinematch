@@ -2,27 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Film, Menu, X, LogOut, ChevronDown } from "lucide-react";
 import { NAV_LINKS } from "../constants/navLinks";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router";
 import NavMenu from "./NavMenu";
 
-interface MockUser {
-  displayName: string;
-  email: string;
-  photoURL?: string;
-}
-
-// Placeholder auth state — swap this out for a real useAuth() hook later.
-// Clicking "Sign In" below just fakes a logged-in user so you can preview
-// both UI states without any backend wired up yet.
-const DUMMY_USER: MockUser = {
-  displayName: "Jacob",
-  email: "jacob@example.com",
-};
-
 export default function Navbar() {
-  const [user, setUser] = useState<MockUser | null>(null);
-  const loading = false;
-  const signOut = () => setUser(null);
-  const signIn = () => setUser(DUMMY_USER);
+  const navigate = useNavigate();
+  const { user, loading, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -93,7 +79,7 @@ export default function Navbar() {
           {!loading && !user && (
             <button
               type="button"
-              onClick={signIn}
+              onClick={() => navigate("/auth")}
               className="inline-flex items-center rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-[#0a0e1a] transition-colors hover:bg-amber-400"
             >
               Sign In
@@ -169,14 +155,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
-          <NavMenu
-            user={user}
-            loading={loading}
-            setMobileOpen={setMobileOpen}
-            signOut={signOut}
-            signIn={signIn}
-            initials={initials}
-          />
+          <NavMenu setMobileOpen={setMobileOpen} />
         )}
       </AnimatePresence>
     </nav>

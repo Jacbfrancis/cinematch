@@ -16,7 +16,7 @@ export const routes = [
       { path: "surprise-me", element: <SurpriseMePage /> },
       { path: "results", element: <RecommendationPage /> },
       { path: "favorites", element: <FavoritesPage /> },
-      { path: "authentication", element: <AuthPage /> },
+      { path: "auth", element: <AuthPage /> },
       { path: "forgot-password", element: <ForgotPasswordPage /> },
     ],
   },

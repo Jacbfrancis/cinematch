@@ -1,25 +1,26 @@
 import { motion } from "framer-motion";
 import { LogOut } from "lucide-react";
 import { NAV_LINKS } from "../constants/navLinks";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router";
 import type { Dispatch, SetStateAction } from "react";
 
 type NavMenuProps = {
-  user: { displayName: string; email: string } | null;
-  loading: boolean;
   setMobileOpen: Dispatch<SetStateAction<boolean>>;
-  signOut: () => void;
-  signIn: () => void;
-  initials: string;
 };
 
-export default function NavMenu({
-  user,
-  loading,
-  setMobileOpen,
-  signOut,
-  signIn,
-  initials,
-}: NavMenuProps) {
+export default function NavMenu({ setMobileOpen }: NavMenuProps) {
+  const navigate = useNavigate();
+  const { user, loading, signOut } = useAuth();
+
+  const initials =
+    user?.displayName
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() ?? "?";
+
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
@@ -52,7 +53,7 @@ export default function NavMenu({
             <button
               type="button"
               onClick={() => {
-                signIn();
+                navigate("/auth");
                 setMobileOpen(false);
               }}
               className="flex w-full items-center justify-center rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-[#0a0e1a] transition-colors hover:bg-amber-400"

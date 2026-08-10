@@ -1,22 +1,20 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { auth } from "../../firebase/firebase";
+import { useNavigate } from "react-router";
 
-interface SignUpFormProps {
+type SignUpFormProps = {
   onSwitchToSignIn: () => void;
-  onSubmit?: (data: {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) => void;
-}
+};
 
-export default function SignUpForm({
-  onSwitchToSignIn,
-  onSubmit,
-}: SignUpFormProps) {
+export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,10 +23,69 @@ export default function SignUpForm({
     confirmPassword: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    onSubmit?.(formData);
-  };
+    setError("");
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Create the user account
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password,
+      );
+
+      // Set the user's display name
+      await updateProfile(userCredential.user, {
+        displayName: formData.name,
+      });
+
+      // Redirect to home page on success
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+
+      // Map Firebase error codes to user-friendly messages
+      const errorCode = error instanceof FirebaseError ? error.code : "unknown";
+
+      switch (errorCode) {
+        case "auth/email-already-in-use":
+          setError(
+            "An account with this email already exists. Please sign in instead.",
+          );
+          break;
+        case "auth/invalid-email":
+          setError("Please enter a valid email address.");
+          break;
+        case "auth/weak-password":
+          setError("Password should be at least 6 characters.");
+          break;
+        case "auth/network-request-failed":
+          setError(
+            "Network error. Please check your internet connection and try again.",
+          );
+          break;
+        default:
+          setError("Failed to create account. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div>
@@ -53,6 +110,13 @@ export default function SignUpForm({
           Join CineMatch and start your movie journey.
         </p>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {error}
+        </div>
+      )}
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-3">
@@ -178,10 +242,11 @@ export default function SignUpForm({
 
         <button
           type="submit"
-          className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-3.5 font-bold text-[#07101D] transition hover:scale-[1.01]"
+          disabled={loading}
+          className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-3.5 font-bold text-[#07101D] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Sign Up
-          <ArrowRight className="h-4 w-4" />
+          {loading ? "Creating account..." : "Sign Up"}
+          {!loading && <ArrowRight className="h-4 w-4" />}
         </button>
       </form>
 

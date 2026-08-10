@@ -14,9 +14,7 @@ export default function ForgotPasswordForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     await onSubmit?.(email);
-
     setIsSent(true);
   };
 
@@ -33,7 +31,7 @@ export default function ForgotPasswordForm({
         </p>
 
         <Link
-          to="/authentication"
+          to="/auth"
           className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-6 py-3 font-semibold text-[#07101D]"
         >
           Back to Sign In
@@ -46,7 +44,7 @@ export default function ForgotPasswordForm({
     <div>
       {/* Back Link */}
       <Link
-        to="/authentication"
+        to="/auth"
         className="inline-flex items-center gap-2 text-sm text-gray-400 transition hover:text-white"
       >
         <ArrowLeft className="h-4 w-4" />
