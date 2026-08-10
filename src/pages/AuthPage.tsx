@@ -7,7 +7,7 @@ import SignUpForm from "../components/auth/SignUpForm";
 import { useAuth } from "../context/AuthContext";
 
 export default function AuthPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, authError, clearAuthError } = useAuth();
   const [isSignIn, setIsSignIn] = useState(true);
 
   // If the user is already authenticated, don't show the auth page.
@@ -61,6 +61,19 @@ export default function AuthPage() {
         {/* FORM CARD */}
         <div className="w-full max-w-xl">
           <div className="rounded-3xl border border-white/10 bg-[#07101D]/70 p-6 backdrop-blur-2xl lg:p-10">
+            {authError && (
+              <div className="mb-4 flex items-start justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                <span>{authError}</span>
+                <button
+                  type="button"
+                  onClick={clearAuthError}
+                  aria-label="Dismiss error"
+                  className="shrink-0 text-red-300 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             <AnimatePresence mode="wait">
               {isSignIn ? (
                 <motion.div

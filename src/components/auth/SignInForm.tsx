@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { auth } from "../../firebase/firebase";
+import { auth, signInWithGoogle } from "../../firebase/firebase";
 
 type SignInFormProps = {
   onSwitchToSignUp: () => void;
@@ -16,6 +18,7 @@ export default function SignInForm({ onSwitchToSignUp }: SignInFormProps) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -66,6 +69,37 @@ export default function SignInForm({ onSwitchToSignUp }: SignInFormProps) {
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError("");
+
+    try {
+      setGoogleLoading(true);
+      await signInWithGoogle();
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+
+      const errorCode =
+        error instanceof FirebaseError ? error.code : "unknown";
+
+      switch (errorCode) {
+        case "auth/popup-closed-by-user":
+        case "auth/cancelled-popup-request":
+          setError("Google sign-in was cancelled.");
+          break;
+        case "auth/popup-blocked":
+          setError(
+            "Google sign-in was blocked by your browser. Please allow pop-ups for this site and try again.",
+          );
+          break;
+        default:
+          setError("Failed to sign in with Google. Please try again.");
+      }
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -186,10 +220,12 @@ export default function SignInForm({ onSwitchToSignUp }: SignInFormProps) {
       <div className="flex flex-col gap-3">
         <button
           type="button"
-          className="flex items-center justify-center gap-2 rounded-lg border border-white/15 py-3 text-sm font-medium text-gray-200 transition-colors hover:border-white/30"
+          onClick={handleGoogleSignIn}
+          disabled={googleLoading || loading}
+          className="flex items-center justify-center gap-2 rounded-lg border border-white/15 py-3 text-sm font-medium text-gray-200 transition-colors hover:border-white/30 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <span className="text-base font-bold text-[#4285F4]">G</span>
-          Sign in with Google
+          {googleLoading ? "Signing in with Google..." : "Sign in with Google"}
         </button>
       </div>
     </div>

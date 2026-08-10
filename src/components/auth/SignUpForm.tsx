@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { auth } from "../../firebase/firebase";
+import { auth, signInWithGoogle } from "../../firebase/firebase";
 import { useNavigate } from "react-router";
 
 type SignUpFormProps = {
@@ -14,6 +17,7 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -84,6 +88,43 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleGoogleSignUp() {
+    setError("");
+
+    try {
+      setGoogleLoading(true);
+      await signInWithGoogle();
+      // A Google sign-in also creates the account automatically.
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+
+      const errorCode =
+        error instanceof FirebaseError ? error.code : "unknown";
+
+      switch (errorCode) {
+        case "auth/popup-closed-by-user":
+        case "auth/cancelled-popup-request":
+          setError("Google sign-up was cancelled.");
+          break;
+        case "auth/popup-blocked":
+          setError(
+            "Google sign-up was blocked by your browser. Please allow pop-ups for this site and try again.",
+          );
+          break;
+        case "auth/account-exists-with-different-credential":
+          setError(
+            "An account already exists with the same email but a different sign-in method. Please sign in instead.",
+          );
+          break;
+        default:
+          setError("Failed to sign up with Google. Please try again.");
+      }
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -261,10 +302,12 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
       <div className="space-y-3">
         <button
           type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 py-3 text-white"
+          onClick={handleGoogleSignUp}
+          disabled={googleLoading || loading}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 py-3 text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           <span className="font-bold text-[#4285F4]">G</span>
-          Sign up with Google
+          {googleLoading ? "Signing up with Google..." : "Sign up with Google"}
         </button>
       </div>
 
