@@ -78,7 +78,9 @@ export default function SignInForm({ onSwitchToSignUp }: SignInFormProps) {
     try {
       setGoogleLoading(true);
       await signInWithGoogle();
-      navigate("/");
+      // In production this is a redirect that reloads the page; only navigate
+      // here for the popup (dev) path.
+      if (import.meta.env.DEV) navigate("/");
     } catch (error) {
       console.error(error);
 

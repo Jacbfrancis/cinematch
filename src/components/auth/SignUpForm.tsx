@@ -98,7 +98,9 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
       setGoogleLoading(true);
       await signInWithGoogle();
       // A Google sign-in also creates the account automatically.
-      navigate("/");
+      // In production this is a redirect that reloads the page; only navigate
+      // here for the popup (dev) path.
+      if (import.meta.env.DEV) navigate("/");
     } catch (error) {
       console.error(error);
 

@@ -6,7 +6,7 @@ import {
   browserSessionPersistence,
   GoogleAuthProvider,
   signInWithPopup,
-  type UserCredential,
+  signInWithRedirect,
 } from "firebase/auth";
 
 // Your web app's Firebase configuration (values loaded from .env)
@@ -24,17 +24,22 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 /**
- * Signs the user in with a Google popup.
+ * Signs the user in with Google.
  *
- * We use the popup flow (reliable on localhost, where the COOP header that
- * breaks popups on some production hosts is absent) and session-backed
- * persistence instead of IndexedDB. This specifically avoids the
- * "Database is closing/hidden" IndexedDB errors seen on local development.
+ * Dev (localhost): uses the popup flow with session-backed persistence, which
+ * avoids the IndexedDB "Database is closing/hidden" errors on local dev.
  *
- * The user stays signed in across page refreshes in the same tab/session.
+ * Prod (e.g. Netlify): hosts send a Cross-Origin-Opener-Policy header that
+ * breaks popups, so we use the redirect flow instead. The result is picked up
+ * on the way back by AuthContext via getRedirectResult.
  */
-export async function signInWithGoogle(): Promise<UserCredential> {
-  await setPersistence(auth, browserSessionPersistence);
+export async function signInWithGoogle(): Promise<void> {
   const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+
+  if (import.meta.env.DEV) {
+    await setPersistence(auth, browserSessionPersistence);
+    await signInWithPopup(auth, provider);
+  } else {
+    await signInWithRedirect(auth, provider);
+  }
 }
