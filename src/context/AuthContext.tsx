@@ -10,6 +10,7 @@ import {
   onAuthStateChanged,
   signOut as firebaseSignOut,
   getRedirectResult,
+  browserPopupRedirectResolver,
   type User,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
@@ -47,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // app root (this provider mounts exactly once, above the router).
     if (!processedRedirect.current) {
       processedRedirect.current = true;
-      getRedirectResult(auth)
+      getRedirectResult(auth, browserPopupRedirectResolver)
         .then((result) => {
           if (result?.user) setUser(result.user);
         })

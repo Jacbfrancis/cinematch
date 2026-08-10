@@ -4,6 +4,7 @@ import {
   getAuth,
   setPersistence,
   browserSessionPersistence,
+  browserPopupRedirectResolver,
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
@@ -40,6 +41,6 @@ export async function signInWithGoogle(): Promise<void> {
     await setPersistence(auth, browserSessionPersistence);
     await signInWithPopup(auth, provider);
   } else {
-    await signInWithRedirect(auth, provider);
+    await signInWithRedirect(auth, provider, browserPopupRedirectResolver);
   }
 }
