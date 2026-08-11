@@ -10,6 +10,9 @@ type MovieBannerProps = {
   runtime: string;
   genres: string[];
   backdrop: string;
+  onPlayTrailer?: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 };
 
 const DEFAULT_MOVIE: MovieBannerProps = {
@@ -26,7 +29,6 @@ const DEFAULT_MOVIE: MovieBannerProps = {
 
 export default function MovieBanner(props: Partial<MovieBannerProps> = {}) {
   const movie = { ...DEFAULT_MOVIE, ...props };
-
   return (
     <section className="relative w-full overflow-hidden bg-[#0a0e1a]">
       {/* Backdrop */}
@@ -53,9 +55,11 @@ export default function MovieBanner(props: Partial<MovieBannerProps> = {}) {
           </h1>
 
           {/* Mood tags + tagline */}
-          <p className="mt-4 text-sm text-gray-300 md:text-base">
-            Based on your mood: {movie.moodTags.join(", ")}
-          </p>
+          {movie.moodTags.length > 0 && (
+            <p className="mt-4 text-sm text-gray-300 md:text-base">
+              Based on your mood: {movie.moodTags.join(", ")}
+            </p>
+          )}
           <p className="mt-1 text-sm text-gray-400 md:text-base">
             {movie.tagline}
           </p>
@@ -102,6 +106,7 @@ export default function MovieBanner(props: Partial<MovieBannerProps> = {}) {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
+              onClick={movie.onPlayTrailer}
               className="flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-6 py-3 text-sm font-semibold text-[#0a0e1a] transition-colors hover:bg-amber-400"
             >
               <Play className="h-4 w-4 fill-[#0a0e1a]" />
@@ -109,10 +114,15 @@ export default function MovieBanner(props: Partial<MovieBannerProps> = {}) {
             </button>
             <button
               type="button"
+              onClick={movie.onToggleFavorite}
               className="flex items-center justify-center gap-2 rounded-lg border border-amber-500/40 px-6 py-3 text-sm font-semibold text-amber-400 transition-colors hover:border-amber-500 hover:bg-amber-500/10"
             >
-              <Heart className="h-4 w-4" />
-              Add to Favorites
+              <Heart
+                className={`h-4 w-4 ${
+                  movie.isFavorite ? "fill-amber-500 text-amber-500" : ""
+                }`}
+              />
+              {movie.isFavorite ? "In Favorites" : "Add to Favorites"}
             </button>
           </div>
         </div>

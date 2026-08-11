@@ -66,10 +66,12 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="mt-6 flex flex-col items-center justify-between gap-4 border-white/10 md:flex-row">
-        <p className="text-xs text-gray-500">
-          © 2026 CineMatch. All rights reserved. Powered by TMDB.
-        </p>
+      <div className="text-xs text-gray-500 mt-6 flex flex-col items-start justify-start gap-4 border-white/10 md:flex-col">
+        <span className="flex gap-2">
+          <img className="w-10" src="/tmdb-logo.svg" alt="tmdb logo" />
+          Powered by TMDB.
+        </span>{" "}
+        <p className="">© 2026 CineMatch. All rights reserved.</p>
       </div>
     </footer>
   );

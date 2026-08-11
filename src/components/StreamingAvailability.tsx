@@ -3,14 +3,15 @@ import { Play } from "lucide-react";
 interface Platform {
   id: string;
   name: string;
-  color: string; // tailwind text color class
+  color: string; // tailwind text color class (used as fallback when no logo)
   url: string;
+  logo?: string;
 }
 
 interface StreamingAvailabilityProps {
   platforms: Platform[];
   trailerThumbnail: string;
-  trailerDuration: string;
+  trailerDuration?: string;
   onPlayTrailer?: () => void;
 }
 
@@ -44,22 +45,43 @@ export default function StreamingAvailability(
         <div className="p-6">
           <h2 className="text-sm font-bold text-white">Available On</h2>
 
-          <div className="mt-6 grid grid-cols-3 gap-4 sm:grid-cols-5">
-            {platforms.map((platform) => (
-              <div
-                key={platform.id}
-                className="flex flex-col items-center gap-2"
-              >
-                <div className="flex aspect-square w-full items-center justify-center rounded-2xl bg-black shadow-md ring-1 ring-white/10">
-                  <span
-                    className={`px-1 text-center text-sm font-extrabold tracking-tight ${platform.color}`}
-                  >
+          {platforms.length === 0 ? (
+            <p className="mt-6 text-sm text-gray-400">
+              Not currently streaming on a major platform.
+            </p>
+          ) : (
+            <div className="mt-6 grid grid-cols-3 gap-4 sm:grid-cols-5">
+              {platforms.map((platform) => (
+                <a
+                  key={platform.id}
+                  href={platform.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Watch on ${platform.name}`}
+                  className="group flex flex-col items-center gap-2"
+                >
+                  <div className="flex aspect-square w-full items-center justify-center rounded-2xl bg-black shadow-md ring-1 ring-white/10 transition-transform group-hover:scale-105 group-hover:ring-amber-500/40">
+                    {platform.logo ? (
+                      <img
+                        src={platform.logo}
+                        alt={platform.name}
+                        className="h-3/4 w-3/4 object-contain"
+                      />
+                    ) : (
+                      <span
+                        className={`px-1 text-center text-sm font-extrabold tracking-tight ${platform.color}`}
+                      >
+                        {platform.name}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-center text-xs text-gray-400 group-hover:text-gray-200">
                     {platform.name}
                   </span>
-                </div>
-              </div>
-            ))}
-          </div>
+                </a>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Watch Trailer */}
@@ -86,11 +108,18 @@ export default function StreamingAvailability(
               <Play className="h-5 w-5 translate-x-0.5 fill-current" />
             </span>
 
-            {/* Duration badge */}
-            <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-gray-200">
-              {trailerDuration}
-            </span>
+            {trailerDuration ? (
+              <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-gray-200">
+                {trailerDuration}
+              </span>
+            ) : null}
           </button>
+
+          {!onPlayTrailer && (
+            <p className="mt-3 text-xs text-gray-500">
+              No trailer available for this title.
+            </p>
+          )}
         </div>
       </div>
     </section>

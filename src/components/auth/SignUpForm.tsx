@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { auth, signInWithGoogle } from "../../firebase/firebase";
+import { getOrCreateUserDoc } from "../../firebase/favorites";
 import { useNavigate } from "react-router";
 
 type SignUpFormProps = {
@@ -58,6 +56,9 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
         displayName: formData.name,
       });
 
+      // Create the user's Firestore document (profile + favorites).
+      await getOrCreateUserDoc(userCredential.user);
+
       // Redirect to home page on success
       navigate("/");
     } catch (error) {
@@ -98,12 +99,14 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
       setGoogleLoading(true);
       await signInWithGoogle();
       // A Google sign-in also creates the account automatically.
+      if (auth.currentUser) {
+        await getOrCreateUserDoc(auth.currentUser);
+      }
       navigate("/");
     } catch (error) {
       console.error(error);
 
-      const errorCode =
-        error instanceof FirebaseError ? error.code : "unknown";
+      const errorCode = error instanceof FirebaseError ? error.code : "unknown";
 
       switch (errorCode) {
         case "auth/popup-closed-by-user":

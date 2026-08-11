@@ -9,7 +9,7 @@ import {
   Clock,
 } from "lucide-react";
 
-type SortOption = "recent" | "alphabetical" | "rating" | "year";
+export type SortOption = "recent" | "alphabetical" | "rating" | "year";
 
 const SORT_OPTIONS: { id: SortOption; label: string; icon: typeof Clock }[] = [
   { id: "recent", label: "Recently Added", icon: Clock },

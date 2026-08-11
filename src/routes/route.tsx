@@ -1,5 +1,6 @@
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage";
+import MovieDetailsPage from "../pages/MovieDetailsPage";
 import QuestionnairePage from "../pages/QuestionnairePage";
 import SurpriseMePage from "../pages/SurpriseMePage";
 import RecommendationPage from "../pages/RecommendationPage";
@@ -12,6 +13,7 @@ export const routes = [
     element: <MainLayout />,
     children: [
       { path: "/", element: <HomePage /> },
+      { path: "movie/:id", element: <MovieDetailsPage /> },
       { path: "questionnaire", element: <QuestionnairePage /> },
       { path: "surprise-me", element: <SurpriseMePage /> },
       { path: "results", element: <RecommendationPage /> },

@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { Bookmark, Heart, MonitorSmartphone } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Navigate } from "react-router";
+import { Navigate, useSearchParams } from "react-router";
 import SignInForm from "../components/auth/SignInForm";
 import SignUpForm from "../components/auth/SignUpForm";
 import { useAuth } from "../context/AuthContext";
 
 export default function AuthPage() {
   const { user, loading, authError, clearAuthError } = useAuth();
-  const [isSignIn, setIsSignIn] = useState(true);
+  const [searchParams] = useSearchParams();
+  // Support linking straight to the sign-up view via /auth?mode=signup.
+  const [isSignIn, setIsSignIn] = useState(
+    () => searchParams.get("mode") !== "signup",
+  );
 
   // If the user is already authenticated, don't show the auth page.
   if (!loading && user) {
