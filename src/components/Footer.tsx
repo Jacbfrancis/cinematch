@@ -21,7 +21,7 @@ export default function Footer() {
             </a>
             <p className="mt-4 max-w-md text-md text-gray-400">
               Answer a few simple questions and get a movie recommendation
-              tailored to your mood, preferences, and available time.
+              tailored just for you.
             </p>
           </div>
 

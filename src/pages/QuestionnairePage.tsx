@@ -7,7 +7,9 @@ import GenreStep from "../components/GenreStep";
 import TimeStep from "../components/TimeStep";
 import ExperienceStep from "../components/ExperienceStep";
 import Emoji from "../components/Emoji";
+import LoadingMovie from "../components/LoadingMovie";
 import { useNavigate } from "react-router";
+import { useRecommendationStore } from "../store/recommendationStore";
 
 interface Answers {
   mood: string | null;
@@ -58,6 +60,7 @@ const STEP_META: Record<number, { title: React.ReactNode; subtitle: string }> =
 
 export default function Questionnaire() {
   const navigate = useNavigate();
+  const { generateRecommendation, isLoading } = useRecommendationStore();
 
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState<Answers>({
@@ -83,9 +86,14 @@ export default function Questionnaire() {
     if (step < TOTAL_STEPS) {
       setStep((s) => s + 1);
     } else {
-      // Final step — hand answers off to your matching logic here
-      console.log("Questionnaire complete:", answers);
+      // Final step — ask Gemini for a recommendation, then show the results.
+      void handleSubmit();
     }
+  };
+
+  const handleSubmit = async () => {
+    await generateRecommendation(answers);
+    navigate("/results");
   };
 
   const meta = STEP_META[step];
@@ -230,6 +238,9 @@ export default function Questionnaire() {
           </div>
         )}
       </div>
+
+      {/* Full-screen loading state while Gemini + TMDB resolve the pick */}
+      {isLoading && <LoadingMovie />}
     </main>
   );
 }

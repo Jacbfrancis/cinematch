@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -12,12 +13,33 @@ import {
   addFavorite,
   fetchFavorites,
   getOrCreateUserDoc,
+  mergeFavorites,
   removeFavoriteById,
   toFavoriteMovie,
   type FavoriteMovie,
 } from "../firebase/favorites";
 import type { Movie } from "../services/tmdb";
-import SignInPromptModal from "../components/SignInPromptModal";
+
+const LOCAL_FAVORITES_KEY = "cinematch.favorites";
+
+function readLocalFavorites(): FavoriteMovie[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_FAVORITES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as FavoriteMovie[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalFavorites(movies: FavoriteMovie[]) {
+  try {
+    localStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(movies));
+  } catch {
+    // Storage may be unavailable (private mode / quota) — ignore.
+  }
+}
 
 interface FavoritesContextValue {
   favorites: FavoriteMovie[];
@@ -25,8 +47,7 @@ interface FavoritesContextValue {
   isFavorite: (id: number) => boolean;
   toggleFavorite: (movie: Movie) => Promise<void>;
   removeFavorite: (id: number) => Promise<void>;
-  authPromptOpen: boolean;
-  closeAuthPrompt: () => void;
+  transferLocalFavorites: (uid: string) => Promise<void>;
 }
 
 const FavoritesContext = createContext<FavoritesContextValue | undefined>(
@@ -39,10 +60,12 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   const [favorites, setFavorites] = useState<FavoriteMovie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [authPromptOpen, setAuthPromptOpen] = useState(false);
+  // Remembers the uid for which a successful localStorage→DB transfer happened,
+  // so a stale in-flight fetch can't overwrite the transferred favorites.
+  const transferredUidRef = useRef<string | null>(null);
 
-  // Load the user's favorites whenever their auth state changes (on mount,
-  // reload, sign-in and sign-out).
+  // Load the user's favorites whenever their auth state changes. Guests load
+  // from localStorage; signed-in users load from Firestore.
   useEffect(() => {
     let active = true;
 
@@ -53,16 +76,30 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     };
 
     if (!userId) {
+      transferredUidRef.current = null;
       // Defer past the effect body so we don't set state synchronously.
-      Promise.resolve().then(() => finish([]));
+      Promise.resolve().then(() => finish(readLocalFavorites()));
+      return;
+    }
+
+    if (transferredUidRef.current === userId) {
+      // Favorites were already set by a successful transfer for this user.
       return;
     }
 
     fetchFavorites(userId)
-      .then(finish)
+      .then((movies) => {
+        if (!active) return;
+        if (transferredUidRef.current === userId) return;
+        setFavorites(movies);
+        setIsLoading(false);
+      })
       .catch((error) => {
         console.error("Failed to load favorites", error);
-        finish([]);
+        if (!active) return;
+        if (transferredUidRef.current === userId) return;
+        setFavorites([]);
+        setIsLoading(false);
       });
 
     return () => {
@@ -81,28 +118,31 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   const toggleFavorite = useCallback(
     async (movie: Movie) => {
+      const favorite = toFavoriteMovie(movie);
+      const existing = favorites.some((item) => item.id === movie.id);
+
       if (!user) {
-        setAuthPromptOpen(true);
+        // Guest: persist to localStorage.
+        const next = existing
+          ? favorites.filter((item) => item.id !== movie.id)
+          : [favorite, ...favorites];
+        setFavorites(next);
+        writeLocalFavorites(next);
         return;
       }
 
-      const existing = favorites.some((favorite) => favorite.id === movie.id);
-      const favorite = toFavoriteMovie(movie);
-
-      // Optimistic update so the UI responds immediately.
+      // Signed in: optimistic update + Firestore.
       setFavorites((prev) =>
         existing
           ? prev.filter((item) => item.id !== movie.id)
           : [favorite, ...prev],
       );
-
       try {
         await ensureDoc();
         if (existing) await removeFavoriteById(user.uid, movie.id);
         else await addFavorite(user.uid, favorite);
       } catch (error) {
         console.error("Failed to update favorite", error);
-        // Re-sync with the database if the write failed.
         try {
           setFavorites(await fetchFavorites(user.uid));
         } catch {
@@ -116,12 +156,13 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const removeFavorite = useCallback(
     async (id: number) => {
       if (!user) {
-        setAuthPromptOpen(true);
+        const next = favorites.filter((item) => item.id !== id);
+        setFavorites(next);
+        writeLocalFavorites(next);
         return;
       }
 
       setFavorites((prev) => prev.filter((item) => item.id !== id));
-
       try {
         await ensureDoc();
         await removeFavoriteById(user.uid, id);
@@ -134,8 +175,25 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         }
       }
     },
-    [user, ensureDoc],
+    [user, favorites, ensureDoc],
   );
+
+  const transferLocalFavorites = useCallback(async (uid: string) => {
+    const local = readLocalFavorites();
+    if (local.length === 0) {
+      writeLocalFavorites([]);
+      return;
+    }
+    try {
+      const merged = await mergeFavorites(uid, local);
+      writeLocalFavorites([]);
+      transferredUidRef.current = uid;
+      setFavorites(merged);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to transfer local favorites", error);
+    }
+  }, []);
 
   const value = useMemo<FavoritesContextValue>(
     () => ({
@@ -144,8 +202,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       isFavorite,
       toggleFavorite,
       removeFavorite,
-      authPromptOpen,
-      closeAuthPrompt: () => setAuthPromptOpen(false),
+      transferLocalFavorites,
     }),
     [
       favorites,
@@ -153,17 +210,13 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       isFavorite,
       toggleFavorite,
       removeFavorite,
-      authPromptOpen,
+      transferLocalFavorites,
     ],
   );
 
   return (
     <FavoritesContext.Provider value={value}>
       {children}
-      <SignInPromptModal
-        open={authPromptOpen}
-        onClose={() => setAuthPromptOpen(false)}
-      />
     </FavoritesContext.Provider>
   );
 }

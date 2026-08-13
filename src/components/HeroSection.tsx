@@ -73,7 +73,7 @@ export default function HeroSection() {
         {/* Subtext */}
         <p className="mx-auto mt-5 max-w-xl text-base text-gray-300 md:text-lg">
           Answer a few simple questions and get a movie recommendation tailored
-          to your mood, preferences, and available time.
+          just for you.
         </p>
 
         {/* CTA button */}

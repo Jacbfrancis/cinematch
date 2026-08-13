@@ -262,3 +262,50 @@ export async function fetchMovieWatchProviders(
 
   return { link: regionWatch.link, platforms };
 }
+/**
+ * Searches TMDB for a movie by title and returns its full details (including
+ * runtime and genre names). Used to resolve the title Gemini recommends into
+ * a real {@link Movie}.
+ */
+export async function searchMovie(title: string): Promise<Movie> {
+  requiresApiKey();
+
+  const data = await fetch(
+    `${BASE_URL}/search/movie?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(title)}`,
+  ).then(getJson<{ results: TmdbMovie[] | undefined }>);
+
+  const first = data.results?.[0];
+  if (!first) {
+    throw new Error(`Could not find "${title}" on TMDB.`);
+  }
+
+  return fetchMovieDetails(first.id);
+}
+
+export type MovieCredits = {
+  director: string;
+  cast: string[];
+};
+
+type TmdbCredits = {
+  crew?: { job: string; name: string }[];
+  cast?: { name: string }[];
+};
+
+/**
+ * Fetches the director and top-billed cast for a movie (used by the results
+ * page's "About the movie" section).
+ */
+export async function fetchMovieCredits(id: number): Promise<MovieCredits> {
+  requiresApiKey();
+
+  const data = await fetch(
+    `${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}&language=en-US`,
+  ).then(getJson<TmdbCredits>);
+
+  const director =
+    data.crew?.find((person) => person.job === "Director")?.name ?? "";
+  const cast = (data.cast ?? []).slice(0, 5).map((person) => person.name);
+
+  return { director, cast };
+}

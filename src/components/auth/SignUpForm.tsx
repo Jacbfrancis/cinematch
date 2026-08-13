@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { auth, signInWithGoogle } from "../../firebase/firebase";
 import { getOrCreateUserDoc } from "../../firebase/favorites";
+import { useFavorites } from "../../context/FavoritesContext";
 import { useNavigate } from "react-router";
 
 type SignUpFormProps = {
@@ -12,6 +13,7 @@ type SignUpFormProps = {
 
 export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
   const navigate = useNavigate();
+  const { transferLocalFavorites } = useFavorites();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -59,6 +61,9 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
       // Create the user's Firestore document (profile + favorites).
       await getOrCreateUserDoc(userCredential.user);
 
+      // Move any favorites saved while signed out into the new account.
+      await transferLocalFavorites(userCredential.user.uid);
+
       // Redirect to home page on success
       navigate("/");
     } catch (error) {
@@ -101,6 +106,8 @@ export default function SignUpForm({ onSwitchToSignIn }: SignUpFormProps) {
       // A Google sign-in also creates the account automatically.
       if (auth.currentUser) {
         await getOrCreateUserDoc(auth.currentUser);
+        // Move any favorites saved while signed out into the new account.
+        await transferLocalFavorites(auth.currentUser.uid);
       }
       navigate("/");
     } catch (error) {

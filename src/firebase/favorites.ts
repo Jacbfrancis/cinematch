@@ -78,6 +78,24 @@ export async function fetchFavorites(uid: string): Promise<FavoriteMovie[]> {
 }
 
 /**
+ * Merges a list of movies into a user's favorites (de-duped by id), keeping the
+ * passed-in movies first. Used to transfer locally-saved favorites into the
+ * database when a user signs up. Returns the merged list.
+ */
+export async function mergeFavorites(
+  uid: string,
+  movies: FavoriteMovie[],
+): Promise<FavoriteMovie[]> {
+  const ref = userDoc(uid);
+  const snap = await getDoc(ref);
+  const existing = (snap.data()?.favorites as FavoriteMovie[] | undefined) ?? [];
+  const incomingIds = new Set(movies.map((movie) => movie.id));
+  const merged = [...movies, ...existing.filter((movie) => !incomingIds.has(movie.id))];
+  await setDoc(ref, { favorites: merged }, { merge: true });
+  return merged;
+}
+
+/**
  * Adds a movie to a user's favorites. Reads the current list, de-dupes by id
  * and prepends the movie so it appears first under "Recently Added".
  */
