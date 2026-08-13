@@ -1,10 +1,7 @@
 import { Film } from "lucide-react";
 import { NAV_LINKS } from "../constants/navLinks";
 
-const CONTACT_LINKS = [
-  { label: "How it works", href: "/how-it-works" },
-  { label: "Support", href: "/support" },
-];
+const CONTACT_LINKS = [{ label: "How it works", href: "/how-it-works" }];
 
 export default function Footer() {
   return (

@@ -7,6 +7,7 @@ import RecommendationPage from "../pages/RecommendationPage";
 import FavoritesPage from "../pages/FavoritesPage";
 import AuthPage from "../pages/AuthPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import SearchPage from "../pages/SearchPage";
 
 export const routes = [
   {
@@ -15,6 +16,8 @@ export const routes = [
       { path: "/", element: <HomePage /> },
       { path: "movie/:id", element: <MovieDetailsPage /> },
       { path: "questionnaire", element: <QuestionnairePage /> },
+      { path: "search", element: <SearchPage /> },
+      { path: "favorites", element: <FavoritesPage /> },
       { path: "surprise-me", element: <SurpriseMePage /> },
       { path: "results", element: <RecommendationPage /> },
       { path: "favorites", element: <FavoritesPage /> },

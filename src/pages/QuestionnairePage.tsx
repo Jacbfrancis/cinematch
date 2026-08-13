@@ -8,7 +8,7 @@ import TimeStep from "../components/TimeStep";
 import ExperienceStep from "../components/ExperienceStep";
 import Emoji from "../components/Emoji";
 import LoadingMovie from "../components/LoadingMovie";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useRecommendationStore } from "../store/recommendationStore";
 
 interface Answers {
@@ -60,11 +60,20 @@ const STEP_META: Record<number, { title: React.ReactNode; subtitle: string }> =
 
 export default function Questionnaire() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { generateRecommendation, isLoading } = useRecommendationStore();
 
-  const [step, setStep] = useState(1);
+  // Allow deep-linking straight into the questionnaire. The hero section links
+  // to /questionnaire?step=2&mood=<id> so clicking a mood emoji lands the user
+  // on question 2 with that mood already selected.
+  const initialStep = Number(searchParams.get("step")) || 1;
+  const initialMood = searchParams.get("mood");
+
+  const [step, setStep] = useState(
+    initialStep >= 2 && initialStep <= TOTAL_STEPS ? initialStep : 1,
+  );
   const [answers, setAnswers] = useState<Answers>({
-    mood: null,
+    mood: initialMood,
     genre: null,
     time: null,
     experience: "",

@@ -282,6 +282,38 @@ export async function searchMovie(title: string): Promise<Movie> {
   return fetchMovieDetails(first.id);
 }
 
+/**
+ * Searches TMDB for movies matching a query and maps them into the app's
+ * {@link Movie} shape. Used by the Search page to let users find movies by
+ * title. Returns an empty array for blank queries.
+ */
+export async function searchMovies(query: string): Promise<Movie[]> {
+  requiresApiKey();
+
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const [data, genreById] = await Promise.all([
+    fetch(
+      `${BASE_URL}/search/movie?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(trimmed)}&include_adult=false`,
+    ).then(getJson<{ results: TmdbMovie[] | undefined }>),
+    getGenreMap(),
+  ]);
+
+  return (data.results ?? []).map((movie) => ({
+    id: movie.id,
+    title: movie.title,
+    rating: movie.vote_average,
+    genres: movie.genre_ids
+      .map((genreId) => genreById.get(genreId))
+      .filter((name): name is string => Boolean(name)),
+    poster: imageUrl(movie.poster_path),
+    backdrop: imageUrl(movie.backdrop_path),
+    overview: movie.overview,
+    releaseDate: movie.release_date,
+  }));
+}
+
 export type MovieCredits = {
   director: string;
   cast: string[];

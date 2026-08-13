@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { Sparkles, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router";
 import Emoji from "./Emoji";
 import { MOODS } from "../constants/moods";
 import CallToActionButton from "./CallToActionButton";
@@ -35,6 +36,8 @@ function smoothScrollBy(distance: number, duration = 700) {
 }
 
 export default function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative w-full overflow-hidden bg-[#0a0e1a] px-6 pb-16 pt-20 md:px-12">
       {/* Mobile Background image */}
@@ -99,6 +102,9 @@ export default function HeroSection() {
                 key={id}
                 type="button"
                 variants={cardVariants}
+                onClick={() =>
+                  navigate(`/questionnaire?step=2&mood=${encodeURIComponent(id)}`)
+                }
                 whileHover={{
                   rotate: [0, -4, 4, -3, 3, 0],
                   scale: 1.06,
