@@ -108,6 +108,13 @@ export const useRecommendationStore = create<RecommendationState>()(
       });
       try {
         const suggestion = await surpriseMovie(get().seenTitles);
+        // Record the suggested title immediately so the "no repeats" list always
+        // advances — even if the TMDB lookup below fails and we bail to catch.
+        set((state) =>
+          state.seenTitles.includes(suggestion.title)
+            ? {}
+            : { seenTitles: [...state.seenTitles, suggestion.title] },
+        );
         const movie = await searchMovie(suggestion.title);
         const [videos, watch, credits] = await Promise.all([
           fetchMovieVideos(movie.id),
@@ -116,18 +123,15 @@ export const useRecommendationStore = create<RecommendationState>()(
         ]);
         const trailer = pickTrailer(videos);
 
-        set((state) => ({
+        set({
           suggestion,
           movie,
           credits,
           trailerUrl: trailer?.youtubeUrl ?? null,
           trailerThumbnail: trailer?.thumbnail ?? movie.backdrop,
           providers: watch.platforms,
-          seenTitles: state.seenTitles.includes(movie.title)
-            ? state.seenTitles
-            : [...state.seenTitles, movie.title],
           isLoading: false,
-        }));
+        });
       } catch (err) {
         set({
           isLoading: false,

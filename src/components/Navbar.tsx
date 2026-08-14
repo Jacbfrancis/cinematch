@@ -3,14 +3,19 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Film, Menu, X, LogOut, ChevronDown } from "lucide-react";
 import { NAV_LINKS } from "../constants/navLinks";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import NavMenu from "./NavMenu";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  // True when the current URL is at (or under) the given nav link href.
+  const isActive = (href: string) =>
+    href === "/" ? location.pathname === "/" : location.pathname.startsWith(href);
 
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +68,7 @@ export default function Navbar() {
               <a
                 href={link.href}
                 className={
-                  link.label === "Home"
+                  isActive(link.href)
                     ? "border-b-2 border-amber-500 pb-1 text-sm font-medium text-amber-500"
                     : "text-sm font-medium text-gray-300 transition-colors hover:text-white"
                 }

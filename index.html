@@ -2,9 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/popcorn.png" />
+    <link rel="icon" type="image/png" href="/popcorn.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cinematch</title>
+
+    <!-- Primary meta -->
+    <title>CineMatch — Find your next favorite movie</title>
+    <meta
+      name="description"
+      content="Answer a few quick questions and CineMatch picks the perfect movie for your mood — complete with a trailer, where to stream it, and why it fits you."
+    />
+    <meta name="author" content="CineMatch" />
+    <meta name="theme-color" content="#020817" />
+
+    <!-- Open Graph (Facebook / iMessage / some apps) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CineMatch" />
+    <meta property="og:title" content="CineMatch — Find your next favorite movie" />
+    <meta
+      property="og:description"
+      content="Answer a few quick questions and get a movie picked just for you — with trailer, streaming availability, and why it fits your mood."
+    />
+    <meta property="og:image" content="/hero-background.png" />
+    <meta property="og:url" content="/" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CineMatch — Find your next favorite movie" />
+    <meta
+      name="twitter:description"
+      content="Answer a few quick questions and get a movie picked just for you — with trailer, streaming availability, and why it fits your mood."
+    />
+    <meta name="twitter:image" content="/hero-background.png" />
+
+    <!-- Performance: resolve TMDB API + image hosts early -->
+    <link rel="preconnect" href="https://api.themoviedb.org" crossorigin />
+    <link rel="preconnect" href="https://image.tmdb.org" crossorigin />
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>

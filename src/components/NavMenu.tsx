@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { LogOut } from "lucide-react";
 import { NAV_LINKS } from "../constants/navLinks";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import type { Dispatch, SetStateAction } from "react";
 
 type NavMenuProps = {
@@ -11,7 +11,12 @@ type NavMenuProps = {
 
 export default function NavMenu({ setMobileOpen }: NavMenuProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading, signOut } = useAuth();
+
+  // True when the current URL is at (or under) the given nav link href.
+  const isActive = (href: string) =>
+    href === "/" ? location.pathname === "/" : location.pathname.startsWith(href);
 
   const initials =
     user?.displayName
@@ -37,7 +42,7 @@ export default function NavMenu({ setMobileOpen }: NavMenuProps) {
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className={
-                  link.label === "Home"
+                  isActive(link.href)
                     ? "block rounded-lg bg-amber-500/10 px-3 py-2.5 text-sm font-medium text-amber-500"
                     : "block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
                 }

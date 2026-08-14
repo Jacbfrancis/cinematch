@@ -49,7 +49,9 @@ The viewer wants a movie picked at random — the more unexpected the better.
 Choose ONE real movie that feels genuinely surprising: prefer an underrated,
 lesser-known gem, a deep cut, a foreign or cult classic, or an unexpected
 genre mashup — NOT the obvious mega-popular blockbuster everyone has seen.
-Vary your choice dramatically between calls so no two surprises feel alike.`
+Pull from a VERY WIDE, diverse range across genres, decades, countries, and
+styles. Deliberately avoid repeating choices you have already made for this
+viewer, and avoid falling back to the same one or two safe picks every time.`
     : `You are CineMatch, a movie curation specialist.
 Suggest EXACTLY ONE great, real movie that fits this viewer:
 ${viewerDescription}`;
@@ -84,6 +86,10 @@ Respond with ONLY JSON, no prose:
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
+            // Surprise picks need high sampling randomness, otherwise the model
+            // is deterministic and keeps returning the same one or two movies.
+            temperature: surprise ? 1.2 : 0.9,
+            topP: surprise ? 0.95 : 0.9,
             responseMimeType: "application/json",
             responseSchema: {
               type: "OBJECT",
