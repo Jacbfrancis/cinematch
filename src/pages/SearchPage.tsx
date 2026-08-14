@@ -38,7 +38,7 @@ export default function SearchPage() {
       } finally {
         setLoading(false);
       }
-    }, 600);
+    }, 700);
 
     return () => clearTimeout(handle);
   }, [query]);
@@ -115,7 +115,7 @@ export default function SearchPage() {
             No movies found for “{query.trim()}”.
           </p>
         ) : withPoster.length > 0 ? (
-          <div className="flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-4 md:overflow-visible md:pb-0 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {withPoster.map((movie) => (
               <MovieCard
                 key={movie.id}
@@ -125,6 +125,7 @@ export default function SearchPage() {
                 genres={movie.genres}
                 releaseDate={movie.releaseDate}
                 poster={movie.poster}
+                fullWidth
                 isFavorite={isFavorite(movie.id)}
                 onToggleFavorite={() => toggleFavorite(movie)}
               />

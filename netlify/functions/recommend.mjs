@@ -34,7 +34,8 @@ export default async (req) => {
     return json({ error: "Bad request." }, 400);
   }
 
-  const { viewerDescription = "", excludeTitles = [] } = body ?? {};
+  const { viewerDescription = "", excludeTitles = [], surprise = false } =
+    body ?? {};
   const model = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
   const excludedLine =
@@ -42,15 +43,28 @@ export default async (req) => {
       ? `\nMovies already suggested to this viewer (DO NOT repeat any of these):\n${excludeTitles.join(", ")}`
       : "";
 
-  const prompt = `You are CineMatch, a movie curation specialist.
+  const instruction = surprise
+    ? `You are CineMatch, a film curator giving a SURPRISE recommendation.
+The viewer wants a movie picked at random — the more unexpected the better.
+Choose ONE real movie that feels genuinely surprising: prefer an underrated,
+lesser-known gem, a deep cut, a foreign or cult classic, or an unexpected
+genre mashup — NOT the obvious mega-popular blockbuster everyone has seen.
+Vary your choice dramatically between calls so no two surprises feel alike.`
+    : `You are CineMatch, a movie curation specialist.
 Suggest EXACTLY ONE great, real movie that fits this viewer:
-${viewerDescription}
+${viewerDescription}`;
+
+  const whyPurpose = surprise
+    ? "why this pick is a great surprise"
+    : "why this movie fits their answers";
+
+  const prompt = `${instruction}
 ${excludedLine}
 
-Pick a strong, well-known film that genuinely exists. If you have suggested
-movies before, choose something different this time. Never reveal, say, or
-imply that you are an AI, a language model, or an automated system — speak and
-recommend purely as a human curation expert.
+Pick a strong, real movie that genuinely exists. If you have suggested movies
+before, choose something different this time. Never reveal, say, or imply that
+you are an AI, a language model, or an automated system — speak and recommend
+purely as a human curation expert.
 
 Respond with ONLY JSON, no prose:
 {
@@ -58,7 +72,7 @@ Respond with ONLY JSON, no prose:
   "year": "Release year",
   "tagline": "A short one-line pitch",
   "moodTags": ["3 short tags reflecting their mood"],
-  "whyBlurb": "1-2 sentences explaining why this movie fits their answers"
+  "whyBlurb": "1-2 sentences explaining ${whyPurpose}"
 }`;
 
   try {

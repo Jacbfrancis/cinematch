@@ -81,3 +81,41 @@ export async function recommendMovie(
 
   return data.suggestion;
 }
+
+/**
+ * Asks the recommendation service for a deliberately random, unexpected movie
+ * (the "Surprise me" feature). Sends a `surprise: true` flag so the server
+ * prompts the model to pick something off the beaten path rather than a
+ * predictable favorite. Pass `excludeTitles` so repeated surprises stay fresh.
+ */
+export async function surpriseMovie(
+  excludeTitles: string[] = [],
+): Promise<MovieSuggestion> {
+  let response: Response;
+  try {
+    response = await fetch(RECOMMEND_ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ surprise: true, excludeTitles }),
+    });
+  } catch {
+    throw new Error(
+      "We couldn't reach our recommendation service. Please try again.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      "We couldn't pick a surprise movie this time. Please try again.",
+    );
+  }
+
+  const data = (await response.json()) as { suggestion?: MovieSuggestion };
+  if (!data.suggestion) {
+    throw new Error(
+      "We couldn't pick a surprise movie this time. Please try again.",
+    );
+  }
+
+  return data.suggestion;
+}

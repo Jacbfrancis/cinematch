@@ -16,6 +16,7 @@ export default function RecommendationPage() {
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
   const {
+    mode,
     answers,
     suggestion,
     movie,
@@ -26,6 +27,7 @@ export default function RecommendationPage() {
     isLoading,
     error,
     generateRecommendation,
+    generateSurprise,
   } = useRecommendationStore();
 
   const openTrailer = () => {
@@ -33,7 +35,8 @@ export default function RecommendationPage() {
   };
 
   const handleTryAnother = () => {
-    if (answers) void generateRecommendation(answers);
+    if (mode === "surprise") void generateSurprise();
+    else if (answers) void generateRecommendation(answers);
     else navigate("/questionnaire");
   };
 

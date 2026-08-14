@@ -8,6 +8,7 @@ import FavoritesPage from "../pages/FavoritesPage";
 import AuthPage from "../pages/AuthPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import SearchPage from "../pages/SearchPage";
+import HowItWorksPage from "../pages/HowItWorksPage";
 
 export const routes = [
   {
@@ -21,6 +22,7 @@ export const routes = [
       { path: "surprise-me", element: <SurpriseMePage /> },
       { path: "results", element: <RecommendationPage /> },
       { path: "favorites", element: <FavoritesPage /> },
+      { path: "how-it-works", element: <HowItWorksPage /> },
       { path: "auth", element: <AuthPage /> },
       { path: "forgot-password", element: <ForgotPasswordPage /> },
     ],

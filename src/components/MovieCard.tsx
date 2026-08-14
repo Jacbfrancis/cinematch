@@ -11,6 +11,13 @@ type MovieCardProps = {
   poster: string;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  /**
+   * When true, the card fills its grid cell on all breakpoints. Used by the
+   * Search page (which lays cards out in a grid even on mobile). When false
+   * the card keeps its fixed mobile width for horizontal carousels
+   * (see PopularMatches).
+   */
+  fullWidth?: boolean;
 };
 
 export default function MovieCard({
@@ -23,6 +30,7 @@ export default function MovieCard({
   poster,
   isFavorite = false,
   onToggleFavorite,
+  fullWidth = false,
 }: MovieCardProps) {
   const navigate = useNavigate();
 
@@ -39,7 +47,9 @@ export default function MovieCard({
           openDetails();
         }
       }}
-      className="relative w-55 shrink-0 cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#121736] transition-colors hover:border-amber-500/40 md:w-auto"
+      className={`relative ${
+        fullWidth ? "w-full" : "w-55 shrink-0"
+      } cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#121736] transition-colors hover:border-amber-500/40 md:w-auto`}
     >
       {/* Poster */}
       <div className="relative aspect-2/3 w-full">
