@@ -218,12 +218,6 @@ export default function Questionnaire() {
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
-
-          {/* Privacy note */}
-          <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-500">
-            <Emoji emoji="🔒" label="Private" size={14} />
-            Your answers are private and help improve your recommendations.
-          </p>
         </div>
 
         {/* Surprise Me (step 1 only) */}
@@ -235,6 +229,7 @@ export default function Questionnaire() {
               <div className="h-px flex-1 bg-white/10" />
             </div>
             <button
+              onClick={() => navigate("/surprise-me")}
               type="button"
               className="mt-6 flex w-full items-center gap-3 rounded-xl border border-amber-500/40 bg-[#0d1224]/90 px-5 py-4 text-left transition-colors hover:border-amber-500"
             >
