@@ -1,75 +1,152 @@
-# React + TypeScript + Vite
+# 🍿🎬 CineMatch — AI-Powered Movie Discovery Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Discover movies based on your mood, preferences, and desired viewing experience. CineMatch combines AI-powered recommendations with real-time movie data to help users find their next favorite movie without endless scrolling through streaming platforms.
 
-Currently, two official plugins are available:
+## Table of contents
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Why this project](#why-this-project)
+- [Implementation notes](#implementation-notes)
+- [Future improvements](#future-improvements)
+- [How to run (local)](#how-to-run)
 
-## React Compiler
+## Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### About
 
-## Expanding the ESLint configuration
+CineMatch is an AI-powered movie discovery platform that helps users find personalized movie recommendations based on their mood, preferred genres, available watch time, and the type of experience they are looking for.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Users can either complete a short recommendation questionnaire or use the Surprise Me feature to instantly receive a movie suggestion. Recommendations are generated using Gemini AI and enriched with real-time movie data from TMDB, including ratings, trailers, cast information, streaming availability, and similar movie suggestions.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The project focuses on creating a modern and engaging movie discovery experience while showcasing AI integration, external API consumption, authentication, database management, and responsive frontend development.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 📸 Screenshot
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+![Screenshot](public/screenshots/screenshot_1.png)
 
-```
+<br/>
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Links
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Live Demo: [Demo](https://cinematch-jacob.netlify.app)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
 
-```
+## ✨ Features
+
+- AI-powered movie recommendations using Gemini AI
+- Mood-based recommendation questionnaire
+- "Surprise Me" instant movie recommendation feature
+- Detailed movie recommendation pages
+- Real-time movie data powered by TMDB (ratings, posters, cast, trailers, genres, runtime, and similar movies)
+- Movie search functionality
+- Save movies to favorites
+- User authentication with Firebase
+- Persistent favorites across devices
+- Similar movie recommendations
+- Movie trailers and streaming availability
+- Responsive mobile and desktop experience
+
+---
+
+## 🛠 Tech Stack
+
+- Frontend: React (Vite)
+
+- Language: TypeScript
+
+- Routing: React Router
+
+- Styling: Tailwind CSS
+
+- Animation: Framer Motion
+
+- Authentication: Firebase Authentication
+
+- State Management: Zustand
+
+- Database: Firestore
+
+- AI: Google Gemini API
+
+- Movie Data: TMDB API
+
+- Hosting: Netlify
+
+---
+
+## 📌 Why this project
+
+This project was built to demonstrate:
+
+- Integration of Generative AI into a real-world product
+- Consuming and combining multiple external APIs
+- Authentication and database management with Firebase
+- Building personalized user experiences
+- Responsive UI/UX design across devices
+
+Rather than creating another traditional movie website, I wanted to build a product that helps users solve a common problem: deciding what movie to watch.
+
+---
+
+## 🏗️ Implementation notes
+
+- **AI Recommendation Engine**: User responses from the recommendation questionnaire are sent to Gemini AI, which analyzes mood, preferences, and desired experience to recommend a suitable movie.
+
+- **TMDB Integration**: After Gemini selects a movie, TMDB is used to retrieve rich metadata such as posters, ratings, cast information, trailers, genres, runtime, and similar movies.
+
+- **Guest-Friendly Experience**: Users can receive movie recommendations without creating an account. Authentication is only required when saving movies to favorites.
+
+- **Favorites Management**: Guest favorites are stored locally, while authenticated users have favorites synced to Firestore for persistence across devices.
+
+- **Personalized Recommendation Reasoning**: Every recommendation includes an explanation describing why the movie was selected based on the user's responses.
+
+---
+
+## 📚 Future improvements
+
+- Recommendation history
+- User movie ratings and reviews
+- Cinema discovery based on user location
+- Social sharing of recommendations
+- AI movie comparison assistant
+- Personalized recommendation learning based on favorites and viewing history
+
+---
+
+## 📦 How to run
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/yourusername/cinematch.git
+   ```
+
+2. Navigate to the project folder:
+
+   ```sh
+   cd cinematch
+   ```
+
+3. Install dependencies:
+
+   ```sh
+   npm install
+   ```
+
+4. Create a `.env` file:
+
+   ```env
+   VITE_FIREBASE_API_KEY=your_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_domain
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_TMDB_API_KEY=your_tmdb_key
+   ```
+
+5. Start the development server:
+
+   ```sh
+   npm run dev
+   ```
